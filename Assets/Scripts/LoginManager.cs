@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using DefaultNamespace;
 using TMPro;
 using UnityEngine.UI;
 
@@ -16,60 +17,32 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField passwordInputField;
     public Button loginButton;
 
-    private string domain;
-    private string authUrl;
-    private string interfaceUrl;
+    private string _domain;
+    private string _authUrl;
+    private string _interfaceUrl;
 
-    private HttpClientHandler httpClientHandler;
-    private HttpClient httpClient;
+    private HttpClientHandler _httpClientHandler;
+    private HttpClient _httpClient;
 
     void Start()
     {
-        LoadDomainFromConfig();
+        ConfigLoader configLoader = new ConfigLoader();
+        _domain = configLoader.LoadDomainFromConfig();
+        _authUrl = $"{_domain}/login.php";
+        _interfaceUrl = $"{_domain}/interface.php";
+        
         loginButton.onClick.AddListener(OnLoginButtonClicked);
     }
-
-    void LoadDomainFromConfig()
-    {
-        try
-        {
-            // Read the configuration file
-            string configPath = Path.Combine(Application.dataPath, "config.txt");
-            string[] configLines = File.ReadAllLines(configPath);
-
-            foreach (string line in configLines)
-            {
-                if (line.StartsWith("Domain="))
-                {
-                    domain = line.Substring("Domain=".Length);
-                    break;
-                }
-            }
-
-            if (string.IsNullOrEmpty(domain))
-            {
-                Debug.LogError("Domain not found in config file!");
-                return;
-            }
-
-            authUrl = $"{domain}/login.php";
-            interfaceUrl = $"{domain}/interface.php";
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Failed to read config file: " + e.Message);
-        }
-    }
-
+    
     void InitializeHttpClient()
     {
-        httpClientHandler = new HttpClientHandler()
+        _httpClientHandler = new HttpClientHandler()
         {
             UseCookies = true,
             AllowAutoRedirect = false, // This allows us to handle the redirect ourselves
             CookieContainer = new CookieContainer()
         };
-        httpClient = new HttpClient(httpClientHandler);
+        _httpClient = new HttpClient(_httpClientHandler);
     }
 
     async void OnLoginButtonClicked()
@@ -92,7 +65,7 @@ public class LoginManager : MonoBehaviour
     async Task InitializeSessionAndLogin(string username, string password)
     {
         // Initialize session to obtain PHPSESSID
-        HttpResponseMessage response = await httpClient.GetAsync(authUrl);
+        HttpResponseMessage response = await _httpClient.GetAsync(_authUrl);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -133,7 +106,7 @@ public class LoginManager : MonoBehaviour
             new KeyValuePair<string, string>("password", password),
         });
 
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, authUrl);
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _authUrl);
         request.Content = formData;
 
         // Set headers
@@ -141,10 +114,10 @@ public class LoginManager : MonoBehaviour
         request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 0.9));
         request.Headers.Add("DNT", "1");
         request.Headers.Add("Upgrade-Insecure-Requests", "1");
-        request.Headers.Add("Origin", domain);
-        request.Headers.Referrer = new Uri(authUrl);
+        request.Headers.Add("Origin", _domain);
+        request.Headers.Referrer = new Uri(_authUrl);
 
-        HttpResponseMessage response = await httpClient.SendAsync(request);
+        HttpResponseMessage response = await _httpClient.SendAsync(request);
 
         if (response.StatusCode == HttpStatusCode.Found) // Check for redirect
         {
