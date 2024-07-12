@@ -1,4 +1,6 @@
-﻿using System;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -6,7 +8,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TMPro;
-using UnityEngine;
 using UnityEngine.UI;
 
 public class LoginManager : MonoBehaviour
@@ -108,7 +109,14 @@ public class LoginManager : MonoBehaviour
             if (loginSuccess)
             {
                 Debug.Log("Login successful. Redirecting to interface.");
-                // Further process the successful login, e.g., redirect to interface
+
+                // Save the cookies to be used later
+                foreach (var cookie in cookies)
+                {
+                    ChatManager.sessionCookies.Add(cookie);
+                }
+
+                SceneManager.LoadScene("ChatScene"); // assuming "ChatScene" is the name of your new scene
             }
         }
         else
