@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using DefaultNamespace;
 using TMPro;
@@ -18,7 +20,6 @@ public class ChatManager : MonoBehaviour
     public static List<string> sessionCookies = new List<string>();
 
     private HttpClient _httpClient;
-    private bool _isReceivingData = false;
     private string _domain;
     private string _model;
 
@@ -51,18 +52,18 @@ public class ChatManager : MonoBehaviour
         }
     }
 
-    async void OnSendButtonClicked()
+    void OnSendButtonClicked()
     {
         string message = inputField.text;
 
         if (!string.IsNullOrEmpty(message))
         {
             responseText.text = "Waiting for response...";
-            await SendMessageToChatBot(message);
+            StartCoroutine(SendMessageToChatBot(message));
         }
     }
 
-    async Task SendMessageToChatBot(string message)
+    IEnumerator SendMessageToChatBot(string message)
     {
         // Add the new user message to the list.
         _chatMessages.Add(new { role = "user", content = message });
@@ -77,36 +78,47 @@ public class ChatManager : MonoBehaviour
         string json = JsonConvert.SerializeObject(requestObject);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await _httpClient.PostAsync(_chatApiUrl, content);
+        var responseTask = _httpClient.PostAsync(_chatApiUrl, content);
+        yield return new WaitUntil(() => responseTask.IsCompleted);
 
-        if (response.IsSuccessStatusCode)
+        if (responseTask.Result.IsSuccessStatusCode)
         {
-            var responseStream = await response.Content.ReadAsStreamAsync();
-            await ProcessResponseStream(responseStream);
+            var streamTask = responseTask.Result.Content.ReadAsStreamAsync();
+            yield return new WaitUntil(() => streamTask.IsCompleted);
+            StartCoroutine(ProcessResponseStream(streamTask.Result));
         }
         else
         {
-            var errorResponse = await response.Content.ReadAsStringAsync();
-            Debug.LogError("Error Response: " + errorResponse);
-            responseText.text = "Error: " + response.ReasonPhrase;
+            var errorResponseTask = responseTask.Result.Content.ReadAsStringAsync();
+            yield return new WaitUntil(() => errorResponseTask.IsCompleted);
+            Debug.LogError("Error Response: " + errorResponseTask.Result);
+            responseText.text = "Error: " + responseTask.Result.ReasonPhrase;
         }
     }
 
-    async Task ProcessResponseStream(System.IO.Stream responseStream)
+    IEnumerator ProcessResponseStream(Stream responseStream)
     {
-        using (var reader = new System.IO.StreamReader(responseStream))
+        using (var reader = new StreamReader(responseStream))
         {
-            string line;
             StringBuilder responseContent = new StringBuilder();
 
-            while ((line = await reader.ReadLineAsync()) != null)
+            while (!reader.EndOfStream)
             {
+                Task<string> readLineTask = reader.ReadLineAsync();
+                yield return new WaitUntil(() => readLineTask.IsCompleted);
+
+                string line = readLineTask.Result;
+                if (line == null)
+                {
+                    break;
+                }
+
                 if (line.StartsWith("data: "))
                 {
                     line = line.Substring(6).Trim(); // Remove "data: " part
 
                     // Check if line is "[]" or empty
-                    if (line == "[]" || line == "[]")
+                    if (line == "[]" || string.IsNullOrEmpty(line))
                     {
                         break;
                     }
@@ -125,7 +137,6 @@ public class ChatManager : MonoBehaviour
                             if (chunk.choices[0].delta.content != null)
                             {
                                 responseContent.Append(chunk.choices[0].delta.content);
-                                responseText.text = responseContent.ToString();
                             }
                         }
                     }
@@ -133,21 +144,25 @@ public class ChatManager : MonoBehaviour
                     {
                         Debug.LogError("JSON Deserialization error: " + e.Message);
                     }
+
+                    responseText.text = responseContent.ToString();
                 }
+
+                yield return null; // Ensure the UI updates after processing each line
             }
 
             // Adding AI response to chatMessages list
-            //chatMessages.Add(new { = "assistant", content = responseContent.ToString() });
+            _chatMessages.Add(new { role = "assistant", content = responseContent.ToString() });
         }
     }
 
+    // Classes for response chunk
     private class ResponseChunk
     {
         public string id { get; set; }
         public string @object { get; set; }
         public int created { get; set; }
         public string model { get; set; }
-        public string system_fingerprint { get; set; }
         public List<Choice> choices { get; set; }
 
         public class Choice
@@ -160,7 +175,6 @@ public class ChatManager : MonoBehaviour
 
         public class Delta
         {
-            //public string { get; set; }
             public string content { get; set; }
         }
     }
