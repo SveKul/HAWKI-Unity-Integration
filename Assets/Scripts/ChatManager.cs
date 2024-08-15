@@ -68,7 +68,7 @@ public class ChatManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(message))
         {
-            responseInputField.text = "Waiting for response...";
+            responseInputField.text += "\nWaiting for response...";
             StartCoroutine(SendMessageToChatBot(message));
         }
     }
@@ -104,16 +104,16 @@ public class ChatManager : MonoBehaviour
             var errorResponseTask = responseTask.Result.Content.ReadAsStringAsync();
             yield return new WaitUntil(() => errorResponseTask.IsCompleted);
             Debug.LogError("Error Response: " + errorResponseTask.Result);
-            responseInputField.text = "Error: " + responseTask.Result.ReasonPhrase;
+            responseInputField.text += "\nError: " + responseTask.Result.ReasonPhrase;
         }
     }
 
     IEnumerator ProcessResponseStream(Stream responseStream)
     {
+        StringBuilder responseContent = new StringBuilder();
+
         using (var reader = new StreamReader(responseStream))
         {
-            StringBuilder responseContent = new StringBuilder();
-
             while (!reader.EndOfStream)
             {
                 stopwatch.Start();
@@ -162,13 +162,13 @@ public class ChatManager : MonoBehaviour
                     }
                     stopwatch.Stop();
                     Debug.Log($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms DeSeri");
-
-                    // Update the responseInputField text
-                    responseInputField.text = responseContent.ToString();
                 }
 
                 yield return null; // Ensure the UI updates after processing each line
             }
+
+            // Update the responseInputField text after all chunks are processed
+            responseInputField.text = responseInputField.text.Replace("\nWaiting for response...", "") + "\n" + responseContent.ToString() + "\n\n";
 
             // Adding AI response to chatMessages list
             _chatMessages.Add(new { role = "assistant", content = responseContent.ToString() });
