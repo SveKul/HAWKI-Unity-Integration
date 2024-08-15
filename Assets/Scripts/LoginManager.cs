@@ -32,6 +32,10 @@ public class LoginManager : MonoBehaviour
         _interfaceUrl = $"{_domain}/interface.php";
         
         loginButton.onClick.AddListener(OnLoginButtonClicked);
+        
+        // Add listeners for the Enter key on the input fields
+        usernameInputField.onSubmit.AddListener(delegate { OnInputFieldSubmit(); });
+        passwordInputField.onSubmit.AddListener(delegate { OnInputFieldSubmit(); });
     }
     
     void InitializeHttpClient()
@@ -46,6 +50,16 @@ public class LoginManager : MonoBehaviour
     }
 
     async void OnLoginButtonClicked()
+    {
+        await TryLogin();
+    }
+
+    async void OnInputFieldSubmit()
+    {
+        await TryLogin();
+    }
+
+    async Task TryLogin()
     {
         string username = usernameInputField.text;
         string password = passwordInputField.text;
