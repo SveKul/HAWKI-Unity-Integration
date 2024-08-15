@@ -16,7 +16,7 @@ public class ChatManager : MonoBehaviour
 {
     public TMP_InputField inputField;
     public Button sendButton;
-    public TextMeshProUGUI responseText;
+    public TMP_InputField responseInputField;
 
     private string _chatApiUrl;
     public static List<string> sessionCookies = new List<string>();
@@ -33,15 +33,18 @@ public class ChatManager : MonoBehaviour
     void Start()
     {
         stopwatch = new Stopwatch();
-        
+
         ConfigLoader configLoader = new ConfigLoader();
         _domain = configLoader.LoadDomainFromConfig();
         _model = configLoader.LoadModelFromConfig();
         _chatApiUrl = $"{_domain}/stream-api.php";
         stopwatch.Stop();
-        
+
         InitializeHttpClient();
         sendButton.onClick.AddListener(OnSendButtonClicked);
+
+        // Ensure the responseInputField is not interactable directly by the user
+        responseInputField.readOnly = true;
     }
 
     void InitializeHttpClient()
@@ -65,7 +68,7 @@ public class ChatManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(message))
         {
-            responseText.text = "Waiting for response...";
+            responseInputField.text = "Waiting for response...";
             StartCoroutine(SendMessageToChatBot(message));
         }
     }
@@ -101,9 +104,8 @@ public class ChatManager : MonoBehaviour
             var errorResponseTask = responseTask.Result.Content.ReadAsStringAsync();
             yield return new WaitUntil(() => errorResponseTask.IsCompleted);
             Debug.LogError("Error Response: " + errorResponseTask.Result);
-            responseText.text = "Error: " + responseTask.Result.ReasonPhrase;
+            responseInputField.text = "Error: " + responseTask.Result.ReasonPhrase;
         }
-        
     }
 
     IEnumerator ProcessResponseStream(Stream responseStream)
@@ -161,7 +163,8 @@ public class ChatManager : MonoBehaviour
                     stopwatch.Stop();
                     Debug.Log($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms DeSeri");
 
-                    responseText.text = responseContent.ToString();
+                    // Update the responseInputField text
+                    responseInputField.text = responseContent.ToString();
                 }
 
                 yield return null; // Ensure the UI updates after processing each line
