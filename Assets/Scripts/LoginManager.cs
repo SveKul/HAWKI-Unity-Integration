@@ -16,6 +16,7 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
     public Button loginButton;
+    public TextMeshProUGUI debugText; // Neue Variable für das TextMeshPro-Textfeld
 
     private string _domain;
     private string _authUrl;
@@ -72,7 +73,7 @@ public class LoginManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Please enter both username and password.");
+            UpdateDebugText("Please enter both username and password.");
         }
     }
 
@@ -83,7 +84,7 @@ public class LoginManager : MonoBehaviour
 
         if (!response.IsSuccessStatusCode)
         {
-            Debug.LogError("Failed to initialize session: " + response.ReasonPhrase);
+            UpdateDebugText("Failed to initialize session: " + response.ReasonPhrase);
             return;
         }
 
@@ -95,7 +96,7 @@ public class LoginManager : MonoBehaviour
 
             if (loginSuccess)
             {
-                Debug.Log("Login successful. Redirecting to interface.");
+                UpdateDebugText("Login successful. Redirecting to interface.");
 
                 // Save the cookies to be used later
                 foreach (var cookie in cookies)
@@ -108,7 +109,7 @@ public class LoginManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Failed to obtain session cookies.");
+            UpdateDebugText("Failed to obtain session cookies.");
         }
     }
 
@@ -142,12 +143,24 @@ public class LoginManager : MonoBehaviour
             }
             else if (locationHeader.EndsWith("login.php"))
             {
-                Debug.Log("Login failed. Redirecting back to login.");
+                UpdateDebugText("Login failed. Redirecting back to login.");
                 return false; // Failed login
             }
         }
 
-        Debug.LogError("Login failed.");
+        UpdateDebugText("Login failed.");
         return false;
+    }
+
+    void UpdateDebugText(string message)
+    {
+        if (debugText != null)
+        {
+            debugText.text = message;
+        }
+        else
+        {
+            Debug.LogWarning("Debug TextMeshProUGUI is not assigned.");
+        }
     }
 }
