@@ -70,6 +70,10 @@ public class ChatManager : MonoBehaviour
         {
             responseInputField.text += $"\nUser: {message}\n\n"; // Added an extra newline for better separation
             StartCoroutine(SendMessageToChatBot(message));
+            
+            // Clear the input field text and show the placeholder
+            inputField.text = string.Empty;
+            inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter your message...";
         }
     }
 
