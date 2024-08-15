@@ -42,7 +42,7 @@ public class ChatManager : MonoBehaviour
 
         InitializeHttpClient();
         sendButton.onClick.AddListener(OnSendButtonClicked);
-
+        
         // Ensure the responseInputField is not interactable directly by the user
         responseInputField.readOnly = true;
     }
@@ -68,7 +68,7 @@ public class ChatManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(message))
         {
-            responseInputField.text += "\nWaiting for response...";
+            responseInputField.text += $"\nUser: {message}\n\n"; // Added an extra newline for better separation
             StartCoroutine(SendMessageToChatBot(message));
         }
     }
@@ -84,6 +84,7 @@ public class ChatManager : MonoBehaviour
             stream = true,
             messages = _chatMessages
         };
+
         stopwatch.Start();
         string json = JsonConvert.SerializeObject(requestObject);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -95,6 +96,7 @@ public class ChatManager : MonoBehaviour
 
         if (responseTask.Result.IsSuccessStatusCode)
         {
+            responseInputField.text += "Waiting for response...\n"; // Temporarily add the waiting text
             var streamTask = responseTask.Result.Content.ReadAsStreamAsync();
             yield return new WaitUntil(() => streamTask.IsCompleted);
             StartCoroutine(ProcessResponseStream(streamTask.Result));
@@ -104,7 +106,7 @@ public class ChatManager : MonoBehaviour
             var errorResponseTask = responseTask.Result.Content.ReadAsStringAsync();
             yield return new WaitUntil(() => errorResponseTask.IsCompleted);
             Debug.LogError("Error Response: " + errorResponseTask.Result);
-            responseInputField.text += "\nError: " + responseTask.Result.ReasonPhrase;
+            responseInputField.text = responseInputField.text.Replace("Waiting for response...", "") + "\nError: " + responseTask.Result.ReasonPhrase + "\n";
         }
     }
 
@@ -153,6 +155,12 @@ public class ChatManager : MonoBehaviour
                             if (chunk.choices[0].delta.content != null)
                             {
                                 responseContent.Append(chunk.choices[0].delta.content);
+                                // Replace "Waiting for response..." once response starts coming in
+                                if (responseInputField.text.EndsWith("Waiting for response...\n"))
+                                {
+                                    responseInputField.text = responseInputField.text.Replace("Waiting for response...\n", "");
+                                }
+                                responseInputField.text += chunk.choices[0].delta.content;  // Update UI incrementally
                             }
                         }
                     }
@@ -167,11 +175,10 @@ public class ChatManager : MonoBehaviour
                 yield return null; // Ensure the UI updates after processing each line
             }
 
-            // Update the responseInputField text after all chunks are processed
-            responseInputField.text = responseInputField.text.Replace("\nWaiting for response...", "") + "\n" + responseContent.ToString() + "\n\n";
-
             // Adding AI response to chatMessages list
             _chatMessages.Add(new { role = "assistant", content = responseContent.ToString() });
+
+            responseInputField.text += "\n\n"; // Add new line after the complete response
         }
     }
 
