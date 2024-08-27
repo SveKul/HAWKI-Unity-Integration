@@ -37,7 +37,45 @@ public static class LocalizationManager
         { TextKey.Send, "Senden" }
     };
 
-    public static string CurrentLanguage { get; set; } = "German"; // Default language
+    private static string _currentLanguage = "German"; // Default language
+    public static string CurrentLanguage 
+    { 
+        get => _currentLanguage; 
+        set
+        {
+            if (_currentLanguage != value)
+            {
+                _currentLanguage = value;
+                NotifyLanguageChanged();
+            }
+        }
+    }
+
+    private static List<ILocalizationObserver> observers = new List<ILocalizationObserver>();
+
+    public static void Subscribe(ILocalizationObserver observer)
+    {
+        if (!observers.Contains(observer))
+        {
+            observers.Add(observer);
+        }
+    }
+
+    public static void Unsubscribe(ILocalizationObserver observer)
+    {
+        if (observers.Contains(observer))
+        {
+            observers.Remove(observer);
+        }
+    }
+
+    private static void NotifyLanguageChanged()
+    {
+        foreach (var observer in observers)
+        {
+            observer.OnLanguageChanged();
+        }
+    }
 
     public static string GetLocalizedText(TextKey key)
     {
@@ -51,3 +89,9 @@ public static class LocalizationManager
         }
     }
 }
+
+public interface ILocalizationObserver
+{
+    void OnLanguageChanged();
+}
+

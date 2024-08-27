@@ -1,8 +1,11 @@
 ﻿using TMPro;
 using UnityEngine;
 
+using TMPro;
+using UnityEngine;
+
 [ExecuteAlways]
-public class LocalizedInputField : MonoBehaviour
+public class LocalizedInputField : MonoBehaviour, ILocalizationObserver
 {
     public TextKey placeholderKey;  // Enum reference to the text key for the placeholder
     private TMP_InputField inputField;
@@ -27,10 +30,17 @@ public class LocalizedInputField : MonoBehaviour
             return;
         }
 
+        // Register with LocalizationManager
+        LocalizationManager.Subscribe(this);
+
         // Set the initial placeholder text based on the current language
         UpdatePlaceholderText();
     }
-    
+
+    public void OnLanguageChanged()
+    {
+        UpdatePlaceholderText();
+    }
 
     public void UpdatePlaceholderText()
     {
@@ -39,6 +49,12 @@ public class LocalizedInputField : MonoBehaviour
         {
             placeholderText.text = LocalizationManager.GetLocalizedText(placeholderKey);
         }
+    }
+
+    void OnDestroy()
+    {
+        // Unregister from the LocalizationManager
+        LocalizationManager.Unsubscribe(this);
     }
 
     void OnValidate()
@@ -60,11 +76,11 @@ public class LocalizedInputField : MonoBehaviour
     void Update()
     {
         // Update placeholder text if we're running in the editor
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (!Application.isPlaying)
         {
             UpdatePlaceholderText();
         }
-        #endif
+#endif
     }
 }

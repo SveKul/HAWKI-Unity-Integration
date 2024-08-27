@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 
 [ExecuteAlways]
-public class LocalizedTMProText : MonoBehaviour
+public class LocalizedTMProText : MonoBehaviour, ILocalizationObserver
 {
     public TextKey textKey;  // Enum reference to the text key
     private TextMeshProUGUI textMeshPro;
@@ -21,10 +21,17 @@ public class LocalizedTMProText : MonoBehaviour
             return;
         }
         
+        // Register with LocalizationManager
+        LocalizationManager.Subscribe(this);
+
         // Set the initial text based on the current language
         UpdateText();
     }
-    
+
+    public void OnLanguageChanged()
+    {
+        UpdateText();
+    }
 
     public void UpdateText()
     {
@@ -33,6 +40,12 @@ public class LocalizedTMProText : MonoBehaviour
         {
             textMeshPro.text = LocalizationManager.GetLocalizedText(textKey);
         }
+    }
+
+    void OnDestroy()
+    {
+        // Unregister from the LocalizationManager
+        LocalizationManager.Unsubscribe(this);
     }
 
     void OnValidate()
