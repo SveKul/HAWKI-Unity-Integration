@@ -5,5 +5,13 @@
     LoginSuccessful,
     FailedToObtainSessionCookies,
     LoginFailedRedirectingToLogin,
-    LoginFailed
+    LoginFailed,
+    Welcome,
+    Username,
+    Password,
+    Login,
+    AssistInitialResponse,
+    RequestInitialPlaceholder,
+    Send
+    
 }
