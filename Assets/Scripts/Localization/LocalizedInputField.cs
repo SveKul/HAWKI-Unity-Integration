@@ -1,9 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
 
-using TMPro;
-using UnityEngine;
-
 [ExecuteAlways]
 public class LocalizedInputField : MonoBehaviour, ILocalizationObserver
 {

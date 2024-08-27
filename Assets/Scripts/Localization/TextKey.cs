@@ -12,6 +12,7 @@
     Login,
     AssistInitialResponse,
     RequestInitialPlaceholder,
-    Send
+    Send,
+    WaitingForResponse
     
 }

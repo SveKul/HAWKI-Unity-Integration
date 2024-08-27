@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public static class LocalizationManager
 {
@@ -17,7 +16,8 @@ public static class LocalizationManager
         { TextKey.Login, "Login" },
         { TextKey.AssistInitialResponse, "How may I help?" },
         { TextKey.RequestInitialPlaceholder, "You can enter your request here..." },
-        { TextKey.Send, "Send" }
+        { TextKey.Send, "Send" },
+        { TextKey.WaitingForResponse, "Waiting for response..." }
     };
 
     private static readonly Dictionary<TextKey, string> GermanTexts = new Dictionary<TextKey, string>
@@ -34,7 +34,8 @@ public static class LocalizationManager
         { TextKey.Login, "Login" },
         { TextKey.AssistInitialResponse, "Wie kann ich helfen?" },
         { TextKey.RequestInitialPlaceholder, "Hier kannst Du deine Anfrage stellen..." },
-        { TextKey.Send, "Senden" }
+        { TextKey.Send, "Senden" },
+        { TextKey.WaitingForResponse, "Warte auf Antwort..." }
     };
 
     private static string _currentLanguage = "German"; // Default language

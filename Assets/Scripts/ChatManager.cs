@@ -16,6 +16,7 @@ public class ChatManager : MonoBehaviour
 {
     public TMP_InputField inputField;
     public Button sendButton;
+    public Button clearSessionButton;
     public TMP_InputField responseInputField;
 
     private string _chatApiUrl;
@@ -42,6 +43,7 @@ public class ChatManager : MonoBehaviour
 
         InitializeHttpClient();
         sendButton.onClick.AddListener(OnSendButtonClicked);
+        clearSessionButton.onClick.AddListener(ResetChatSession);
         
         // Ensure the responseInputField is not interactable directly by the user
         responseInputField.readOnly = true;
@@ -73,7 +75,7 @@ public class ChatManager : MonoBehaviour
             
             // Clear the input field text and show the placeholder
             inputField.text = string.Empty;
-            inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter your message...";
+            inputField.placeholder.GetComponent<TextMeshProUGUI>().text = LocalizationManager.GetLocalizedText(TextKey.RequestInitialPlaceholder);
         }
     }
 
@@ -110,7 +112,7 @@ public class ChatManager : MonoBehaviour
             var errorResponseTask = responseTask.Result.Content.ReadAsStringAsync();
             yield return new WaitUntil(() => errorResponseTask.IsCompleted);
             Debug.LogError("Error Response: " + errorResponseTask.Result);
-            responseInputField.text = responseInputField.text.Replace("Waiting for response...", "") + "\nError: " + responseTask.Result.ReasonPhrase + "\n";
+            responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse), "") + "\nError: " + responseTask.Result.ReasonPhrase + "\n";
         }
     }
 
@@ -162,7 +164,7 @@ public class ChatManager : MonoBehaviour
                                 // Replace "Waiting for response..." once response starts coming in
                                 if (responseInputField.text.EndsWith("Waiting for response...\n"))
                                 {
-                                    responseInputField.text = responseInputField.text.Replace("Waiting for response...\n", "");
+                                    responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse)+ "\n", "");
                                 }
                                 responseInputField.text += chunk.choices[0].delta.content;  // Update UI incrementally
                             }
@@ -184,6 +186,18 @@ public class ChatManager : MonoBehaviour
 
             responseInputField.text += "\n\n"; // Add new line after the complete response
         }
+    }
+    
+    public void ResetChatSession()
+    {
+        // Leeren der aktuellen Chat-Nachrichtenliste
+        _chatMessages.Clear();
+
+        // Zurücksetzen der UI-Felder
+        inputField.text = "";
+        inputField.placeholder.GetComponent<TextMeshProUGUI>().text =
+            LocalizationManager.GetLocalizedText(TextKey.AssistInitialResponse);
+        responseInputField.text = "";
     }
 
     // Classes for response chunk
