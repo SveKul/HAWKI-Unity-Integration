@@ -16,7 +16,7 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
     public Button loginButton;
-    public TextMeshProUGUI debugText; // Neue Variable für das TextMeshPro-Textfeld
+    public TextMeshProUGUI debugText; 
 
     private string _domain;
     private string _authUrl;
@@ -27,6 +27,9 @@ public class LoginManager : MonoBehaviour
 
     void Start()
     {
+        // Set the current language; this could be dynamically set based on user preference
+        LocalizationManager.CurrentLanguage = "German"; 
+
         ConfigLoader configLoader = new ConfigLoader();
         _domain = configLoader.LoadDomainFromConfig();
         _authUrl = $"{_domain}/login.php";
@@ -34,7 +37,6 @@ public class LoginManager : MonoBehaviour
         
         loginButton.onClick.AddListener(OnLoginButtonClicked);
         
-        // Add listeners for the Enter key on the input fields
         usernameInputField.onSubmit.AddListener(delegate { OnInputFieldSubmit(); });
         passwordInputField.onSubmit.AddListener(delegate { OnInputFieldSubmit(); });
     }
@@ -44,7 +46,7 @@ public class LoginManager : MonoBehaviour
         _httpClientHandler = new HttpClientHandler()
         {
             UseCookies = true,
-            AllowAutoRedirect = false, // This allows us to handle the redirect ourselves
+            AllowAutoRedirect = false,
             CookieContainer = new CookieContainer()
         };
         _httpClient = new HttpClient(_httpClientHandler);
@@ -67,49 +69,44 @@ public class LoginManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
-            InitializeHttpClient(); // Initialize a new client for each login attempt
-
+            InitializeHttpClient();
             await InitializeSessionAndLogin(username, password);
         }
         else
         {
-            UpdateDebugText("Please enter both username and password.");
+            UpdateDebugText(LocalizationManager.GetLocalizedText(TextKey.PleaseEnterUsernameAndPassword));
         }
     }
 
     async Task InitializeSessionAndLogin(string username, string password)
     {
-        // Initialize session to obtain PHPSESSID
         HttpResponseMessage response = await _httpClient.GetAsync(_authUrl);
 
         if (!response.IsSuccessStatusCode)
         {
-            UpdateDebugText("Failed to initialize session: " + response.ReasonPhrase);
+            UpdateDebugText(string.Format(LocalizationManager.GetLocalizedText(TextKey.FailedToInitializeSession), response.ReasonPhrase));
             return;
         }
 
-        // Load cookies from response if available
         if (response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookies))
         {
-            // Perform login with the obtained cookies
             bool loginSuccess = await MakeLoginRequest(username, password);
 
             if (loginSuccess)
             {
-                UpdateDebugText("Login successful. Redirecting to interface.");
+                UpdateDebugText(LocalizationManager.GetLocalizedText(TextKey.LoginSuccessful));
 
-                // Save the cookies to be used later
                 foreach (var cookie in cookies)
                 {
                     ChatManager.sessionCookies.Add(cookie);
                 }
 
-                SceneManager.LoadScene("ChatScene"); // assuming "ChatScene" is the name of your new scene
+                SceneManager.LoadScene("ChatScene");
             }
         }
         else
         {
-            UpdateDebugText("Failed to obtain session cookies.");
+            UpdateDebugText(LocalizationManager.GetLocalizedText(TextKey.FailedToObtainSessionCookies));
         }
     }
 
@@ -121,10 +118,11 @@ public class LoginManager : MonoBehaviour
             new KeyValuePair<string, string>("password", password),
         });
 
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _authUrl);
-        request.Content = formData;
+        var request = new HttpRequestMessage(HttpMethod.Post, _authUrl)
+        {
+            Content = formData
+        };
 
-        // Set headers
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
         request.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 0.9));
         request.Headers.Add("DNT", "1");
@@ -134,21 +132,21 @@ public class LoginManager : MonoBehaviour
 
         HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-        if (response.StatusCode == HttpStatusCode.Found) // Check for redirect
+        if (response.StatusCode == HttpStatusCode.Found)
         {
             var locationHeader = response.Headers.Location.ToString();
             if (locationHeader.EndsWith("interface.php"))
             {
-                return true; // Successful login
+                return true;
             }
             else if (locationHeader.EndsWith("login.php"))
             {
-                UpdateDebugText("Login failed. Redirecting back to login.");
-                return false; // Failed login
+                UpdateDebugText(LocalizationManager.GetLocalizedText(TextKey.LoginFailedRedirectingToLogin));
+                return false;
             }
         }
 
-        UpdateDebugText("Login failed.");
+        UpdateDebugText(LocalizationManager.GetLocalizedText(TextKey.LoginFailed));
         return false;
     }
 
