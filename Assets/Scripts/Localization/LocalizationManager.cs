@@ -17,7 +17,7 @@ public static class LocalizationManager
         { TextKey.AssistInitialResponse, "How may I help?" },
         { TextKey.RequestInitialPlaceholder, "You can enter your request here..." },
         { TextKey.Send, "Send" },
-        { TextKey.WaitingForResponse, "Waiting for response..." }
+        { TextKey.WaitingForResponse, "Waiting for response...\n" }
     };
 
     private static readonly Dictionary<TextKey, string> GermanTexts = new Dictionary<TextKey, string>
@@ -35,7 +35,7 @@ public static class LocalizationManager
         { TextKey.AssistInitialResponse, "Wie kann ich helfen?" },
         { TextKey.RequestInitialPlaceholder, "Hier kannst Du deine Anfrage stellen..." },
         { TextKey.Send, "Senden" },
-        { TextKey.WaitingForResponse, "Warte auf Antwort..." }
+        { TextKey.WaitingForResponse, "Warte auf Antwort...\n" }
     };
 
     private static string _currentLanguage = "German"; // Default language

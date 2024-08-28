@@ -81,6 +81,7 @@ public class ChatManager : MonoBehaviour
 
     IEnumerator SendMessageToChatBot(string message)
     {
+        responseInputField.text += LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse); // Temporarily add the waiting text
         // Add the new user message to the list.
         _chatMessages.Add(new { role = "user", content = message });
 
@@ -102,7 +103,6 @@ public class ChatManager : MonoBehaviour
 
         if (responseTask.Result.IsSuccessStatusCode)
         {
-            responseInputField.text += "Waiting for response...\n"; // Temporarily add the waiting text
             var streamTask = responseTask.Result.Content.ReadAsStreamAsync();
             yield return new WaitUntil(() => streamTask.IsCompleted);
             StartCoroutine(ProcessResponseStream(streamTask.Result));
@@ -162,9 +162,9 @@ public class ChatManager : MonoBehaviour
                             {
                                 responseContent.Append(chunk.choices[0].delta.content);
                                 // Replace "Waiting for response..." once response starts coming in
-                                if (responseInputField.text.EndsWith("Waiting for response...\n"))
+                                if (responseInputField.text.EndsWith(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse)))
                                 {
-                                    responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse)+ "\n", "");
+                                    responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse), "");
                                 }
                                 responseInputField.text += chunk.choices[0].delta.content;  // Update UI incrementally
                             }
