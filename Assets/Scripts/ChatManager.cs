@@ -81,7 +81,7 @@ public class ChatManager : MonoBehaviour
 
     IEnumerator SendMessageToChatBot(string message)
     {
-        responseInputField.text += LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse); // Temporarily add the waiting text
+        AddWaitingForResponseMessage();
         // Add the new user message to the list.
         _chatMessages.Add(new { role = "user", content = message });
 
@@ -106,6 +106,7 @@ public class ChatManager : MonoBehaviour
             var streamTask = responseTask.Result.Content.ReadAsStreamAsync();
             yield return new WaitUntil(() => streamTask.IsCompleted);
             StartCoroutine(ProcessResponseStream(streamTask.Result));
+            RemoveWaitingForResponseMessage();
         }
         else
         {
@@ -115,6 +116,7 @@ public class ChatManager : MonoBehaviour
             responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse), "") + "\nError: " + responseTask.Result.ReasonPhrase + "\n";
         }
     }
+    
 
     IEnumerator ProcessResponseStream(Stream responseStream)
     {
@@ -161,11 +163,6 @@ public class ChatManager : MonoBehaviour
                             if (chunk.choices[0].delta.content != null)
                             {
                                 responseContent.Append(chunk.choices[0].delta.content);
-                                // Replace "Waiting for response..." once response starts coming in
-                                if (responseInputField.text.EndsWith(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse)))
-                                {
-                                    responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse), "");
-                                }
                                 responseInputField.text += chunk.choices[0].delta.content;  // Update UI incrementally
                             }
                         }
@@ -187,7 +184,20 @@ public class ChatManager : MonoBehaviour
             responseInputField.text += "\n\n"; // Add new line after the complete response
         }
     }
-    
+
+    private void AddWaitingForResponseMessage()
+    {
+        responseInputField.text += LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse); // Temporarily add the waiting text
+    }
+    private void RemoveWaitingForResponseMessage()
+    {
+        // Replace "Waiting for response..."
+        if (responseInputField.text.EndsWith(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse)))
+        {
+            responseInputField.text = responseInputField.text.Replace(LocalizationManager.GetLocalizedText(TextKey.WaitingForResponse), "");
+        }
+    }
+
     public void ResetChatSession()
     {
         // Leeren der aktuellen Chat-Nachrichtenliste
