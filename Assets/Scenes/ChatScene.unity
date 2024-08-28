@@ -206,7 +206,6 @@ MonoBehaviour:
   sendButton: {fileID: 598744156}
   clearSessionButton: {fileID: 720894417}
   responseInputField: {fileID: 402368816}
-  scrollRect: {fileID: 982622395}
 --- !u!1 &320114755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,7 +1232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 249.9, y: -194.6}
+  m_AnchoredPosition: {x: 249.9, y: -195.4}
   m_SizeDelta: {x: 87.219, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &598744156
@@ -1429,7 +1428,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -243.9, y: -167.647}
+  m_AnchoredPosition: {x: -278.2, y: -167.647}
   m_SizeDelta: {x: 46.679, y: 46.679}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &720894417
