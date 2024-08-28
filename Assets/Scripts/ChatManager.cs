@@ -28,18 +28,14 @@ public class ChatManager : MonoBehaviour
 
     // List to store all chat messages
     private List<object> _chatMessages = new List<object>();
-
-    private Stopwatch stopwatch;
+    
 
     void Start()
     {
-        stopwatch = new Stopwatch();
-
         ConfigLoader configLoader = new ConfigLoader();
         _domain = configLoader.LoadDomainFromConfig();
         _model = configLoader.LoadModelFromConfig();
         _chatApiUrl = $"{_domain}/stream-api.php";
-        stopwatch.Stop();
 
         InitializeHttpClient();
         sendButton.onClick.AddListener(OnSendButtonClicked);
@@ -92,15 +88,13 @@ public class ChatManager : MonoBehaviour
             messages = _chatMessages
         };
 
-        stopwatch.Start();
+        
         string json = JsonConvert.SerializeObject(requestObject);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+        
         var responseTask = _httpClient.PostAsync(_chatApiUrl, content);
-        stopwatch.Stop();
-        Debug.Log($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms seriali");
         yield return new WaitUntil(() => responseTask.IsCompleted);
-
+        
         if (responseTask.Result.IsSuccessStatusCode)
         {
             var streamTask = responseTask.Result.Content.ReadAsStreamAsync();
@@ -126,11 +120,8 @@ public class ChatManager : MonoBehaviour
         {
             while (!reader.EndOfStream)
             {
-                stopwatch.Start();
                 Task<string> readLineTask = reader.ReadLineAsync();
                 yield return new WaitUntil(() => readLineTask.IsCompleted);
-                stopwatch.Stop();
-                Debug.Log($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms ReadLine");
 
                 string line = readLineTask.Result;
                 if (line == null)
@@ -140,7 +131,6 @@ public class ChatManager : MonoBehaviour
 
                 if (line.StartsWith("data: "))
                 {
-                    stopwatch.Start();
                     line = line.Substring(6).Trim(); // Remove "data: " part
 
                     // Check if line is "[]" or empty
@@ -171,8 +161,6 @@ public class ChatManager : MonoBehaviour
                     {
                         Debug.LogError("JSON Deserialization error: " + e.Message);
                     }
-                    stopwatch.Stop();
-                    Debug.Log($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms DeSeri");
                 }
 
                 yield return null; // Ensure the UI updates after processing each line
