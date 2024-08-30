@@ -4,16 +4,15 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public class AuthenticationService
 {
     private string _authUrl;
     private HttpClient _httpClient;
-    private LoginDebugLogger _loginDebugLogger;
 
-    public AuthenticationService(string domain, LoginDebugLogger loginDebugLogger)
+    public AuthenticationService(string domain)
     {
-        this._loginDebugLogger = loginDebugLogger;
         _authUrl = $"{domain}/login.php";
         InitializeHttpClient();
     }
@@ -36,13 +35,13 @@ public class AuthenticationService
 
         if (!response.IsSuccessStatusCode)
         {
-            _loginDebugLogger.Log(string.Format(LocalizationManager.GetLocalizedText(TextKey.FailedToInitializeSession), response.ReasonPhrase));
+            Debug.Log(string.Format(LocalizationManager.GetLocalizedText(TextKey.FailedToInitializeSession), response.ReasonPhrase));
             return false;
         }
 
         if (!response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookies))
         {
-            _loginDebugLogger.Log(LocalizationManager.GetLocalizedText(TextKey.FailedToObtainSessionCookies));
+            Debug.Log(LocalizationManager.GetLocalizedText(TextKey.FailedToObtainSessionCookies));
             return false;
         }
 
@@ -80,14 +79,14 @@ public class AuthenticationService
                 {
                     ChatManager.sessionCookies.Add(cookie);
                 }
-                _loginDebugLogger.Log(LocalizationManager.GetLocalizedText(TextKey.LoginSuccessful));
+                Debug.Log(LocalizationManager.GetLocalizedText(TextKey.LoginSuccessful));
                 return true;
             }
-            _loginDebugLogger.Log(LocalizationManager.GetLocalizedText(TextKey.LoginFailedRedirectingToLogin));
+            Debug.Log(LocalizationManager.GetLocalizedText(TextKey.LoginFailedRedirectingToLogin));
             return false;
         }
 
-        _loginDebugLogger.Log(LocalizationManager.GetLocalizedText(TextKey.LoginFailed));
+        Debug.Log(LocalizationManager.GetLocalizedText(TextKey.LoginFailed));
         return false;
     }
 }

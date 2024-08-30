@@ -12,7 +12,6 @@ public class LoginManager : MonoBehaviour
     public TextMeshProUGUI debugText; 
 
     private AuthenticationService _authService;
-    private LoginDebugLogger _loginDebugLogger;
 
     void Start()
     {
@@ -22,8 +21,7 @@ public class LoginManager : MonoBehaviour
         ConfigManager configManager = new ConfigManager();
         string domain = configManager.Domain;
         
-        _loginDebugLogger = new LoginDebugLogger(debugText);
-        _authService = new AuthenticationService(domain, _loginDebugLogger);
+        _authService = new AuthenticationService(domain);
         
         
         loginButton.onClick.AddListener(OnLoginButtonClicked);
@@ -56,7 +54,7 @@ public class LoginManager : MonoBehaviour
         }
         else
         {
-            _loginDebugLogger.Log(LocalizationManager.GetLocalizedText(TextKey.PleaseEnterUsernameAndPassword));
+            Debug.Log(LocalizationManager.GetLocalizedText(TextKey.PleaseEnterUsernameAndPassword));
         }
     }
 }
