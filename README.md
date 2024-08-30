@@ -15,9 +15,10 @@ e.g.
 Domain=https://ki.th-koeln.de
 Model=gpt-4o
 
+Unity Version: 2022.3.30f1
 
 # Unity Configuration
-
+The application uses Newtonsoft.Json to deserialize the received JSON chunks. It is therefore necessary to install the corresponding Unity package.
 
 - Open unity's Package Manager (Window -> Package Manager)
 - Click on the "+" button. Select "Update package by name..."
