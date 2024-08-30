@@ -24,4 +24,3 @@ The application uses Newtonsoft.Json to deserialize the received JSON chunks. It
 - Click on the "+" button. Select "Update package by name..."
 - Enter com.unity.nuget.newtonsoft-json
 - The package gets installed
-- Then in the C# file : using Newtonsoft.Json;
