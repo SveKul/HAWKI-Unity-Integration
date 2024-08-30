@@ -1,5 +1,5 @@
 # About
-HAWKI-Unity-Integration is a Unity client for the HAWKI didactic interface for universities based on the OpenAI API. https://github.com/HAWK-Digital-Environments/HAWKI
+HAWKI-Unity-Integration is a Unity client for the [HAWKI](https://github.com/HAWK-Digital-Environments/HAWKI) didactic interface for universities based on the OpenAI API.
 The application allows access to HAWKI instances from within Unity. This enables the use of OpenAI's API within software projects at the respective university to further process generated texts or integrate contextual information in requests. A valid university ID is required for use.
 
 ![Login](https://github.com/user-attachments/assets/8c7edf35-6f58-4a24-b098-6608fa5dd738)
