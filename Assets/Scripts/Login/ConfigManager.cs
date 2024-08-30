@@ -2,9 +2,18 @@
 
 public class ConfigManager
 {
-    public string LoadDomainFromConfig()
+    public string Domain { get; private set; }
+    public string Model { get; private set; }
+
+    public ConfigManager()
+    {
+        LoadConfigurations();
+    }
+
+    private void LoadConfigurations()
     {
         ConfigLoader configLoader = new ConfigLoader();
-        return configLoader.LoadDomainFromConfig();
+        Domain = configLoader.LoadDomainFromConfig();
+        Model = configLoader.LoadModelFromConfig();
     }
 }

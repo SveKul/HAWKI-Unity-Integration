@@ -20,7 +20,7 @@ public class LoginManager : MonoBehaviour
         LocalizationManager.CurrentLanguage = "German"; 
         
         ConfigManager configManager = new ConfigManager();
-        string domain = configManager.LoadDomainFromConfig();
+        string domain = configManager.Domain;
         
         _loginDebugLogger = new LoginDebugLogger(debugText);
         _authService = new AuthenticationService(domain, _loginDebugLogger);
