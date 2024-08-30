@@ -1,0 +1,2 @@
+﻿Domain=https://ki.th-koeln.de
+Model=gpt-4o
