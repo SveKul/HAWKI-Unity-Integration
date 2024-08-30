@@ -1,13 +1,14 @@
 ﻿using System.Collections;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
+using System.Collections.Generic;
+
 public class ChatManager : MonoBehaviour
 {
     public TMP_InputField inputField;
@@ -22,6 +23,7 @@ public class ChatManager : MonoBehaviour
     private ConfigManager _configManager;
     private UIManager _uiManager;
     private ChatSessionManager _chatSessionManager;
+    private StreamProcessor _streamProcessor;
 
     void Start()
     {
@@ -34,6 +36,7 @@ public class ChatManager : MonoBehaviour
         _uiManager.Initialize(inputField, responseInputField);
 
         _chatSessionManager = new ChatSessionManager(_uiManager);
+        _streamProcessor = new StreamProcessor(_uiManager, _chatSessionManager);
 
         sendButton.onClick.AddListener(OnSendButtonClicked);
         clearSessionButton.onClick.AddListener(_chatSessionManager.ClearSession);
@@ -75,7 +78,7 @@ public class ChatManager : MonoBehaviour
             var streamTask = _httpClientManager.GetResponseStreamAsync(responseTask.Result);
             yield return new WaitUntil(() => streamTask.IsCompleted);
 
-            StartCoroutine(ProcessResponseStream(streamTask.Result));
+            StartCoroutine(_streamProcessor.ProcessResponseStream(streamTask.Result));
             _uiManager.RemoveWaitingMessage();
         }
         else
@@ -85,64 +88,6 @@ public class ChatManager : MonoBehaviour
 
             Debug.LogError("Error Response: " + errorResponseTask.Result);
             _uiManager.AddMessageToResponse($"\nError: {responseTask.Result.ReasonPhrase}\n");
-        }
-    }
-
-    IEnumerator ProcessResponseStream(Stream responseStream)
-    {
-        StringBuilder responseContent = new StringBuilder();
-
-        using (var reader = new StreamReader(responseStream))
-        {
-            while (!reader.EndOfStream)
-            {
-                Task<string> readLineTask = reader.ReadLineAsync();
-                yield return new WaitUntil(() => readLineTask.IsCompleted);
-
-                string line = readLineTask.Result;
-                if (line == null)
-                {
-                    break;
-                }
-
-                if (line.StartsWith("data: "))
-                {
-                    line = line.Substring(6).Trim(); // Remove "data: " part
-
-                    if (line == "[]" || string.IsNullOrEmpty(line))
-                    {
-                        break;
-                    }
-
-                    if (line.StartsWith("["))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        var chunk = JsonConvert.DeserializeObject<ResponseChunk>(line);
-                        if (chunk != null && chunk.choices.Count > 0 && chunk.choices[0].delta != null)
-                        {
-                            if (chunk.choices[0].delta.content != null)
-                            {
-                                responseContent.Append(chunk.choices[0].delta.content);
-                                _uiManager.AddMessageToResponse(chunk.choices[0].delta.content);
-                            }
-                        }
-                    }
-                    catch (JsonSerializationException e)
-                    {
-                        Debug.LogError("JSON Deserialization error: " + e.Message);
-                    }
-                }
-
-                yield return null;
-            }
-
-            _chatSessionManager.AddAssistantMessage(responseContent.ToString());
-
-            _uiManager.AddMessageToResponse("\n\n");
         }
     }
 }
