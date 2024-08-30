@@ -1,6 +1,22 @@
 # About
+HAWKI-Unity-Integration is a Unity client for the HAWKI didactic interface for universities based on the OpenAI API. https://github.com/HAWK-Digital-Environments/HAWKI
+The application allows access to HAWKI instances from within Unity. This enables the use of OpenAI's API within software projects at the respective university to further process generated texts or integrate contextual information in requests. A valid university ID is required for use.
 
-# Configuration
+![Login](https://github.com/user-attachments/assets/8c7edf35-6f58-4a24-b098-6608fa5dd738)
+
+
+![Chat](https://github.com/user-attachments/assets/d09003e9-96ad-4933-95bb-e92f1da8873d)
+
+
+# Prerequisites
+To use, it is necessary to specify both the model being used and the subdomain of the HAWKI interface within the respective university in the config.txt file.
+
+e.g.
+Domain=https://ki.th-koeln.de
+Model=gpt-4o
+
+
+# Unity Configuration
 
 
 - Open unity's Package Manager (Window -> Package Manager)
