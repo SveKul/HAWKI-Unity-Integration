@@ -5,7 +5,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -60,9 +60,10 @@ public class UIManager
     public void ResetUI()
     {
         InputField.text = string.Empty;
-        InputField.placeholder.GetComponent<TextMeshProUGUI>().text = LocalizationManager.GetLocalizedText(TextKey.AssistInitialResponse);
+        InputField.placeholder.GetComponent<TextMeshProUGUI>().text =
+            LocalizationManager.GetLocalizedText(TextKey.AssistInitialResponse);
         ResponseField.text = string.Empty;
-        
+
         // Caret und Text-Position zurücksetzen
         ResetInputFieldTransform(InputField);
         ResetInputFieldTransform(ResponseField);
@@ -79,9 +80,8 @@ public class UIManager
         RectTransform textTransform = inputField.textComponent.GetComponent<RectTransform>();
         textTransform.offsetMin = new Vector2(textTransform.offsetMin.x, 0); // Bottom
         textTransform.offsetMax = new Vector2(textTransform.offsetMax.x, 0); // Top
-        
+
         // Layout-Update erzwingen
         LayoutRebuilder.ForceRebuildLayoutImmediate(inputField.GetComponent<RectTransform>());
     }
-    
 }

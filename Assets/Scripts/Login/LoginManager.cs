@@ -5,7 +5,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -26,21 +26,21 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInputField;
     public TMP_InputField passwordInputField;
     public Button loginButton;
-    public TextMeshProUGUI debugText; 
+    public TextMeshProUGUI debugText;
 
     private AuthenticationService _authService;
 
     void Start()
     {
         // Set the current language; this could be dynamically set based on user preference
-        LocalizationManager.CurrentLanguage = "German"; 
-        
+        LocalizationManager.CurrentLanguage = "German";
+
         ConfigManager configManager = new ConfigManager();
         string domain = configManager.Domain;
-        
+
         _authService = new AuthenticationService(domain);
-        
-        
+
+
         loginButton.onClick.AddListener(OnLoginButtonClicked);
         usernameInputField.onSubmit.AddListener(async delegate { await OnInputFieldSubmit(); });
         passwordInputField.onSubmit.AddListener(async delegate { await OnInputFieldSubmit(); });

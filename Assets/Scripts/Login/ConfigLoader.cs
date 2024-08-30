@@ -5,7 +5,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -25,8 +25,8 @@ namespace DefaultNamespace
     {
         private string _domain;
         private string _model;
-        
-        
+
+
         public string LoadDomainFromConfig()
         {
             try
@@ -49,7 +49,6 @@ namespace DefaultNamespace
                     Debug.LogError("Domain not found in config file!");
                     return null;
                 }
-                
             }
             catch (Exception e)
             {
@@ -81,7 +80,6 @@ namespace DefaultNamespace
                     Debug.LogError("Model not found in config file!");
                     return null;
                 }
-                
             }
             catch (Exception e)
             {

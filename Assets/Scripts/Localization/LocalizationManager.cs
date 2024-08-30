@@ -5,7 +5,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -21,12 +21,12 @@ public static class LocalizationManager
 {
     private static readonly Dictionary<TextKey, string> EnglishTexts = new Dictionary<TextKey, string>
     {
-        { TextKey.PleaseEnterUsernameAndPassword, "Please enter both username and password."},
-        { TextKey.FailedToInitializeSession, "There was a problem starting your session: {0}"},
-        { TextKey.LoginSuccessful, "Login successful. Redirecting to interface."},
-        { TextKey.FailedToObtainSessionCookies, "Failed to obtain session cookies."},
-        { TextKey.LoginFailedRedirectingToLogin, "Login failed. Redirecting back to login."},
-        { TextKey.LoginFailed, "Login failed."},
+        { TextKey.PleaseEnterUsernameAndPassword, "Please enter both username and password." },
+        { TextKey.FailedToInitializeSession, "There was a problem starting your session: {0}" },
+        { TextKey.LoginSuccessful, "Login successful. Redirecting to interface." },
+        { TextKey.FailedToObtainSessionCookies, "Failed to obtain session cookies." },
+        { TextKey.LoginFailedRedirectingToLogin, "Login failed. Redirecting back to login." },
+        { TextKey.LoginFailed, "Login failed." },
         { TextKey.Welcome, "Welcome!" },
         { TextKey.Username, "Username" },
         { TextKey.Password, "Password" },
@@ -39,12 +39,12 @@ public static class LocalizationManager
 
     private static readonly Dictionary<TextKey, string> GermanTexts = new Dictionary<TextKey, string>
     {
-        { TextKey.PleaseEnterUsernameAndPassword, "Bitte geben Sie sowohl Benutzernamen als auch Passwort ein."},
-        { TextKey.FailedToInitializeSession, "Leider konnte Ihre Sitzung nicht gestartet werden: {0}"},
-        { TextKey.LoginSuccessful, "Login erfolgreich. Weiterleitung zur Schnittstelle."},
-        { TextKey.FailedToObtainSessionCookies, "Konnte Sitzungscookies nicht erhalten."},
-        { TextKey.LoginFailedRedirectingToLogin, "Login fehlgeschlagen. Zurück zum Anmeldebildschirm."},
-        { TextKey.LoginFailed, "Login fehlgeschlagen."},
+        { TextKey.PleaseEnterUsernameAndPassword, "Bitte geben Sie sowohl Benutzernamen als auch Passwort ein." },
+        { TextKey.FailedToInitializeSession, "Leider konnte Ihre Sitzung nicht gestartet werden: {0}" },
+        { TextKey.LoginSuccessful, "Login erfolgreich. Weiterleitung zur Schnittstelle." },
+        { TextKey.FailedToObtainSessionCookies, "Konnte Sitzungscookies nicht erhalten." },
+        { TextKey.LoginFailedRedirectingToLogin, "Login fehlgeschlagen. Zurück zum Anmeldebildschirm." },
+        { TextKey.LoginFailed, "Login fehlgeschlagen." },
         { TextKey.Welcome, "Willkommen!" },
         { TextKey.Username, "Benutzername" },
         { TextKey.Password, "Passwort" },
@@ -56,9 +56,10 @@ public static class LocalizationManager
     };
 
     private static string _currentLanguage = "German"; // Default language
-    public static string CurrentLanguage 
-    { 
-        get => _currentLanguage; 
+
+    public static string CurrentLanguage
+    {
+        get => _currentLanguage;
         set
         {
             if (_currentLanguage != value)
@@ -112,4 +113,3 @@ public interface ILocalizationObserver
 {
     void OnLanguageChanged();
 }
-

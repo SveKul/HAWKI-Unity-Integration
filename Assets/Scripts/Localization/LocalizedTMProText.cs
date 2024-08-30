@@ -5,7 +5,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
- 
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -21,7 +21,7 @@ using UnityEngine;
 [ExecuteAlways]
 public class LocalizedTMProText : MonoBehaviour, ILocalizationObserver
 {
-    public TextKey textKey;  // Enum reference to the text key
+    public TextKey textKey; // Enum reference to the text key
     private TextMeshProUGUI textMeshPro;
 
     void Awake()
@@ -34,7 +34,7 @@ public class LocalizedTMProText : MonoBehaviour, ILocalizationObserver
             Debug.LogError("TextMeshProUGUI component is missing on this GameObject.");
             return;
         }
-        
+
         // Register with LocalizationManager
         LocalizationManager.Subscribe(this);
 
