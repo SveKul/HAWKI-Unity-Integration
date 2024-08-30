@@ -206,6 +206,7 @@ MonoBehaviour:
   sendButton: {fileID: 598744156}
   clearSessionButton: {fileID: 720894417}
   responseInputField: {fileID: 402368816}
+  ScrollRect: {fileID: 982622395}
 --- !u!1 &320114755
 GameObject:
   m_ObjectHideFlags: 0

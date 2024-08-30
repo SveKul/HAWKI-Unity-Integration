@@ -15,6 +15,7 @@ public class ChatManager : MonoBehaviour
     public Button sendButton;
     public Button clearSessionButton;
     public TMP_InputField responseInputField;
+    public ScrollRect ScrollRect;
 
     private string _chatApiUrl;
     public static List<string> sessionCookies = new List<string>();
@@ -24,6 +25,7 @@ public class ChatManager : MonoBehaviour
     private UIManager _uiManager;
     private ChatSessionManager _chatSessionManager;
     private StreamProcessor _streamProcessor;
+    
 
     void Start()
     {
@@ -33,7 +35,7 @@ public class ChatManager : MonoBehaviour
         _httpClientManager = new HttpClientManager(sessionCookies, _chatApiUrl);
 
         _uiManager = new UIManager();
-        _uiManager.Initialize(inputField, responseInputField);
+        _uiManager.Initialize(inputField, responseInputField, ScrollRect);
 
         _chatSessionManager = new ChatSessionManager(_uiManager);
         _streamProcessor = new StreamProcessor(_uiManager, _chatSessionManager);
